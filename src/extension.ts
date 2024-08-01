@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 
-import Client from "ftp-ts";
+import { Client } from "basic-ftp";
 import { exec } from "child_process";
 
 interface FTPSettings {
@@ -87,34 +87,33 @@ export function activate(context: vscode.ExtensionContext) {
 			// );
 		});
 		cssWatcher.on("change", async (cssPath) => {
+			// init ftp client
+			const client = new Client();
+			// log ftp to console
+			client.ftp.verbose = true;
 			vscode.window.showInformationMessage(`CSS-Datei geändert: ${cssPath}`);
 			// cssWatcher.close();
 			const parts = cssPath.split("/");
 			log(cssPath);
 			log(path.join(ftpSettings.remotePath, parts.slice(-3).join("/")));
-			await Client.connect({
-				host: ftpSettings.host,
-				user: ftpSettings.user,
-				password: ftpSettings.password,
-				secure: "true",
-				secureOptions: {
-					rejectUnauthorized: false,
-				},
-			})
-				.then((c) => {
-					log(c);
-					c.put(`${cssPath}1`, path.join(ftpSettings.remotePath, parts.slice(-3).join("/")))
-						.then(() => {
-							vscode.window.showInformationMessage("CSS-Datei erfolgreich hochgeladen");
-						})
-						.catch((err) => {
-							vscode.window.showErrorMessage(`Fehler beim Hochladen: ${err.message}`);
-						});
-					c.end();
-				})
-				.catch((err) => {
-					vscode.window.showErrorMessage(`Fehler bei der Kommunikation mit dem FTP Server: ${err.message}`);
+
+			try {
+				await client.access({
+					host: ftpSettings.host,
+					user: ftpSettings.user,
+					password: ftpSettings.password,
+					secure: true,
+					secureOptions: {
+						rejectUnauthorized: false,
+					},
 				});
+				await client.uploadFrom(cssPath, path.join(ftpSettings.remotePath, parts.slice(-3).join("/")));
+				vscode.window.showInformationMessage("CSS-Datei erfolgreich hochgeladen");
+			} catch (err) {
+				console.log(err);
+				vscode.window.showErrorMessage(`Fehler beim Hochladen: ${err}`);
+			}
+			client.close();
 		});
 	});
 

@@ -46,6 +46,7 @@
 		"webpack-cli": "^5.1.4"
 	},
 	"dependencies": {
+		"basic-ftp": "^5.0.5",
 		"child_process": "^1.0.2",
 		"chokidar": "^3.6.0",
 		"ftp": "^0.3.10",
