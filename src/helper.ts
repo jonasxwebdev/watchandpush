@@ -27,7 +27,7 @@ export async function uploadFile(ftpSettings: FTPSettings, localPath: string, re
 			},
 		});
 		await client.uploadFrom(localPath, remotePath);
-		vscode.window.showInformationMessage("CSS-Datei erfolgreich hochgeladen");
+		vscode.window.setStatusBarMessage("Build und Upload erfolgreich", 5000);
 	} catch (err) {
 		vscode.window.showErrorMessage(`Fehler beim Hochladen: ${err}`);
 	} finally {

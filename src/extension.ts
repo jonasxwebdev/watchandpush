@@ -20,6 +20,8 @@ interface Config {
 	templateFolderName: string;
 	ftp: FTPSettings;
 }
+let watcher: chokidar.FSWatcher | null = null;
+let cssWatcher: chokidar.FSWatcher | null = null;
 
 function readConfig(folderPath: string): Config | null {
 	const configPath = path.join(folderPath, ".vscode/wnb.json");
@@ -33,7 +35,7 @@ function readConfig(folderPath: string): Config | null {
 }
 
 export function activate(context: vscode.ExtensionContext) {
-	let disposable = vscode.commands.registerCommand("extension.watchAndBuild", () => {
+	let watchAndBuildCommand = vscode.commands.registerCommand("extension.watchAndBuild", () => {
 		vscode.window.setStatusBarMessage("Dateien werden überwacht...");
 
 		const folderPath = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
@@ -52,20 +54,20 @@ export function activate(context: vscode.ExtensionContext) {
 		// Something to use when events are received.
 		const log = console.log.bind(console);
 
-		const watcher = chokidar.watch(`${folderPath}/**/*${fileExtension}`, {
+		watcher = chokidar.watch(`${folderPath}/**/*${fileExtension}`, {
 			ignored: /node_modules/,
 			persistent: true,
 		});
 
-		const cssWatcher = chokidar.watch(`${folderPath}/**/*.css`, {
+		cssWatcher = chokidar.watch(`${folderPath}/**/*.css`, {
 			persistent: true,
 		});
 
 		watcher.on("change", (filePath: string) => {
-			vscode.window.setStatusBarMessage(
-				`Änderung erkannt: ${filePath.substring(0, filePath.lastIndexOf("/"))}`,
-				5000
-			);
+			// vscode.window.setStatusBarMessage(
+			// 	`Änderung erkannt: ${filePath.substring(0, filePath.lastIndexOf("/"))}`,
+			// 	5000
+			// );
 			log(getBuildPath(filePath));
 
 			var buildPath = getBuildPath(filePath, templateFolderName);
@@ -83,23 +85,45 @@ export function activate(context: vscode.ExtensionContext) {
 						vscode.window.showErrorMessage(`Fehler beim Build: ${stderr}`);
 						return;
 					}
-					vscode.window.setStatusBarMessage("Build erfolgreich abgeschlossen", 5000);
+					vscode.window.setStatusBarMessage("Build erfolgreich", 2000);
 				}
 			);
 		});
 		cssWatcher.on("change", async (cssPath) => {
-			vscode.window.setStatusBarMessage(
-				`CSS-Datei geändert: ${cssPath.substring(0, cssPath.lastIndexOf("/"))}`,
-				5000
-			);
 			const parts = cssPath.split("/");
+			vscode.window.setStatusBarMessage(`CSS-Datei geändert: ${parts[parts.length - 1]}`, 2000);
+			log(parts);
+			log(path.join(ftpSettings.remotePath, parts.slice(-3).join("/")));
 			await uploadFile(ftpSettings, cssPath, path.join(ftpSettings.remotePath, parts.slice(-3).join("/")));
 			// log(cssPath);
 			// log(path.join(ftpSettings.remotePath, parts.slice(-3).join("/")));
 		});
 	});
 
-	context.subscriptions.push(disposable);
+	let stopWatchingCommand = vscode.commands.registerCommand("extension.stopWatching", () => {
+		if (watcher) {
+			watcher.close();
+			watcher = null;
+			vscode.window.setStatusBarMessage("Überwachung gestoppt");
+		} else {
+			vscode.window.setStatusBarMessage("Keine Überwachung aktiv", 5000);
+		}
+
+		if (cssWatcher) {
+			cssWatcher.close();
+			cssWatcher = null;
+		}
+	});
+
+	context.subscriptions.push(watchAndBuildCommand);
+	context.subscriptions.push(stopWatchingCommand);
 }
 
-export function deactivate() {}
+export function deactivate() {
+	if (watcher) {
+		watcher.close();
+	}
+	if (cssWatcher) {
+		cssWatcher.close();
+	}
+}

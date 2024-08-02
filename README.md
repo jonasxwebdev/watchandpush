@@ -2,6 +2,10 @@
 
 ## Features
 
+### Seit der 0.0.3
+
+#### Es gibt nun einen weiteren Befehl "Stop Watching" dieser stoppt alle aktiven Datei Watcher.
+
 Diese Erweiterung führt den Befehl "Watch and Push" ein. Nach aktivierung überwacht sie die festgelegte Dateinendung im aktuellen Workspace Ordner und führt nach einer Änderung dieser den vorher festgelegten build aus. Gleichzeitig werden alle css Dateien überwacht und bei einer Änderung auf den hinterlegten FTP Server geladen.
 
 Diese Erweiterung ist nur für Mitarbeiter der Ulmer WSE gedacht und funktioniert auch nur in dieser Entwicklungsumgebung.
@@ -51,6 +55,10 @@ fileExtension und remotePath sollten so belassen werden. RemotePath muss angepas
 
 Version 1.0
 getestet in Test Umgebung und unter realen Bedingungen
+
+## 0.0.3
+
+Neuer Befehl zur Pausierung der Watcher
 
 ## 0.0.2
 
