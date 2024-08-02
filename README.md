@@ -10,18 +10,31 @@ Diese Erweiterung ist nur für Mitarbeiter der Ulmer WSE gedacht und funktionier
 
 ## Requirements
 
-Vorraussetzung ist ein .vscode Ordner auf /templates Ebene. In diesem muss sich eine wnb.json befinden mit folgendem inhaltlichen Aufbau:
+Vorraussetzung ist ein .vscode Ordner auf /templates Ebene.
+In diesem muss sich eine wnb.json befinden.
 
+```
+├── /
+│   ├── .vscode
+│   │   ├── wnb.json
+├── templates
+│   │   ├── **/ alle Projekte
+```
+
+Mit folgendem inhaltlichen Aufbau:
+
+```json
 {
-"fileExtension": ".htm",
-"buildType": "prod",
-"ftp": {
-"host": "ulmer Webserver Name",
-"user": "Benutzername",
-"password": "\*\*\*\*\*\*\*\*",
-"remotePath": "/templates"
+	"fileExtension": ".htm",
+	"buildType": "prod",
+	"ftp": {
+		"host": "ulmer Webserver Name",
+		"user": "Benutzername",
+		"password": "********",
+		"remotePath": "/templates"
+	}
 }
-}
+```
 
 der buildType, entweder "prod" oder "dev" entscheidet welcher build command aus der Package.json des jeweiligen Projekts ausgelesen und ausgeführt wird.
 
