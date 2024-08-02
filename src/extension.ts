@@ -3,7 +3,8 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 
-import { Client } from "basic-ftp";
+import { getBuildCommand, getBuildPath, uploadFile } from "./helper";
+
 import { exec } from "child_process";
 
 interface FTPSettings {
@@ -15,7 +16,7 @@ interface FTPSettings {
 
 interface Config {
 	fileExtension: string;
-	buildCommand: string;
+	buildType: string;
 	ftp: FTPSettings;
 }
 
@@ -32,7 +33,7 @@ function readConfig(folderPath: string): Config | null {
 
 export function activate(context: vscode.ExtensionContext) {
 	let disposable = vscode.commands.registerCommand("extension.watchAndBuild", () => {
-		vscode.window.showInformationMessage("Dateien werden überwacht...");
+		vscode.window.setStatusBarMessage("Dateien werden überwacht...");
 
 		const folderPath = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
 		if (!folderPath) {
@@ -45,7 +46,7 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 
-		const { fileExtension, buildCommand, ftp: ftpSettings } = config;
+		const { fileExtension, buildType, ftp: ftpSettings } = config;
 
 		// Something to use when events are received.
 		const log = console.log.bind(console);
@@ -59,12 +60,18 @@ export function activate(context: vscode.ExtensionContext) {
 			persistent: true,
 		});
 
-		watcher.on("change", (filePath) => {
-			vscode.window.showInformationMessage(
-				`Änderung erkannt: ${filePath}, ${filePath.substring(0, filePath.lastIndexOf("/"))}`
+		watcher.on("change", (filePath: string) => {
+			vscode.window.setStatusBarMessage(
+				`Änderung erkannt: ${filePath.substring(0, filePath.lastIndexOf("/"))}`,
+				5000
 			);
+			log(getBuildPath(filePath));
 
-			var buildPath = filePath.substring(0, filePath.lastIndexOf("/"));
+			var buildPath = getBuildPath(filePath);
+			var buildCommand = getBuildCommand(buildType, buildPath);
+			if (!buildCommand) {
+				return;
+			}
 			exec(
 				buildCommand,
 				{
@@ -75,45 +82,19 @@ export function activate(context: vscode.ExtensionContext) {
 						vscode.window.showErrorMessage(`Fehler beim Build: ${stderr}`);
 						return;
 					}
-					vscode.window.showInformationMessage("Build erfolgreich abgeschlossen");
+					vscode.window.setStatusBarMessage("Build erfolgreich abgeschlossen", 5000);
 				}
 			);
-			// vscode.window.showInformationMessage(
-			// 	`Css Watcher gestartet für:${path.join(
-			// 		folderPath,
-			// 		"/templates/ulmer-akademie-2024/",
-			// 		cssFileName
-			// 	)}`
-			// );
 		});
 		cssWatcher.on("change", async (cssPath) => {
-			// init ftp client
-			const client = new Client();
-			// log ftp to console
-			client.ftp.verbose = true;
-			vscode.window.showInformationMessage(`CSS-Datei geändert: ${cssPath}`);
-			// cssWatcher.close();
+			vscode.window.setStatusBarMessage(
+				`CSS-Datei geändert: ${cssPath.substring(0, cssPath.lastIndexOf("/"))}`,
+				5000
+			);
 			const parts = cssPath.split("/");
-			log(cssPath);
-			log(path.join(ftpSettings.remotePath, parts.slice(-3).join("/")));
-
-			try {
-				await client.access({
-					host: ftpSettings.host,
-					user: ftpSettings.user,
-					password: ftpSettings.password,
-					secure: true,
-					secureOptions: {
-						rejectUnauthorized: false,
-					},
-				});
-				await client.uploadFrom(cssPath, path.join(ftpSettings.remotePath, parts.slice(-3).join("/")));
-				vscode.window.showInformationMessage("CSS-Datei erfolgreich hochgeladen");
-			} catch (err) {
-				console.log(err);
-				vscode.window.showErrorMessage(`Fehler beim Hochladen: ${err}`);
-			}
-			client.close();
+			await uploadFile(ftpSettings, cssPath, path.join(ftpSettings.remotePath, parts.slice(-3).join("/")));
+			// log(cssPath);
+			// log(path.join(ftpSettings.remotePath, parts.slice(-3).join("/")));
 		});
 	});
 
