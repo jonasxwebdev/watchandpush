@@ -1,14 +1,12 @@
 # watchandpush README
 
-This is the README for your extension "watchandpush". After writing up a brief description, we recommend including the following sections.
-
 ## Features
 
 Diese Erweiterung führt den Befehl "Watch and Push" ein. Nach aktivierung überwacht sie die festgelegte Dateinendung im aktuellen Workspace Ordner und führt nach einer Änderung dieser den vorher festgelegten build aus. Gleichzeitig werden alle css Dateien überwacht und bei einer Änderung auf den hinterlegten FTP Server geladen.
 
 Diese Erweiterung ist nur für Mitarbeiter der Ulmer WSE gedacht und funktioniert auch nur in dieser Entwicklungsumgebung.
 
-## Requirements
+## Voraussetzungen
 
 Vorraussetzung ist ein .vscode Ordner auf /templates Ebene.
 In diesem muss sich eine wnb.json befinden.
@@ -42,15 +40,14 @@ der buildType, entweder "prod" oder "dev" entscheidet welcher build command aus 
 
 fileExtension und remotePath sollten so belassen werden. RemotePath muss angepasst werden, wenn der FTP Benutzer an einer anderen Stelle des FTP Servers einsteigt. hier muss der Pfad bis zum "templates/" Ordner angegeben werden.
 
-## Extension Settings
+## Bekannte Fehler
 
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
+-   wenn "dev" als build Type gewählt wird, kann es bis zu 10 Sekunden dauern, je nach Leistung des Clients, bis der build ausgeführt wird und die CSS Datei hochgeladen wird.
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+Version 1.0
+getestet in Test Umgebung und unter realen Bedingungen
 
 ### 1.0.0
 
