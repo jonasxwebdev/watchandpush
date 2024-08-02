@@ -2,7 +2,9 @@
 	"name": "watchandpush",
 	"displayName": "WatchandPush",
 	"description": "watch files, build and push to ftp",
-	"version": "0.0.1",
+	"publisher": "jonasxwebdev",
+	"repository": "https://github.com/jonasxwebdev/watchandpush",
+	"version": "0.0.2",
 	"engines": {
 		"vscode": "^1.91.0"
 	},
@@ -41,6 +43,7 @@
 		"@vscode/test-cli": "^0.0.9",
 		"@vscode/test-electron": "^2.4.0",
 		"eslint": "^8.57.0",
+		"node-loader": "^2.0.0",
 		"ts-loader": "^9.5.1",
 		"typescript": "^5.4.5",
 		"webpack": "^5.92.1",

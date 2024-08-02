@@ -17,6 +17,7 @@ interface FTPSettings {
 interface Config {
 	fileExtension: string;
 	buildType: string;
+	templateFolderName: string;
 	ftp: FTPSettings;
 }
 
@@ -46,7 +47,7 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 
-		const { fileExtension, buildType, ftp: ftpSettings } = config;
+		const { fileExtension, buildType, templateFolderName, ftp: ftpSettings } = config;
 
 		// Something to use when events are received.
 		const log = console.log.bind(console);
@@ -67,7 +68,7 @@ export function activate(context: vscode.ExtensionContext) {
 			);
 			log(getBuildPath(filePath));
 
-			var buildPath = getBuildPath(filePath);
+			var buildPath = getBuildPath(filePath, templateFolderName);
 			var buildCommand = getBuildCommand(buildType, buildPath);
 			if (!buildCommand) {
 				return;

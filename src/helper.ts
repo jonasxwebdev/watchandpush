@@ -35,14 +35,14 @@ export async function uploadFile(ftpSettings: FTPSettings, localPath: string, re
 	}
 }
 
-export function getBuildPath(path: String): string {
+export function getBuildPath(path: String, templateFolderName: string = "templates"): string {
 	// Split the path by '/'
 	const parts = path.split("/");
 
 	// Find the index of the last 'templates' occurrence
 	let lastIndex = -1;
 	for (let i = 0; i < parts.length; i++) {
-		if (parts[i] === "templates") {
+		if (parts[i] === templateFolderName) {
 			lastIndex = i;
 		}
 	}

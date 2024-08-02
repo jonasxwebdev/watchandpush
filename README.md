@@ -27,6 +27,7 @@ Aufbau der wnb.json:
 {
 	"fileExtension": ".htm",
 	"buildType": "prod",
+	"templateFolderName": "templates",
 	"ftp": {
 		"host": "ulmer Webserver Name",
 		"user": "Benutzername",
@@ -37,6 +38,8 @@ Aufbau der wnb.json:
 ```
 
 der buildType, entweder "prod" oder "dev" entscheidet welcher build command aus der Package.json des jeweiligen Projekts ausgelesen und ausgeführt wird.
+
+templatesFolderName ist der OrdnerName in dem sich die lokale Ordner Struktur befindet.
 
 fileExtension und remotePath sollten so belassen werden. RemotePath muss angepasst werden, wenn der FTP Benutzer an einer anderen Stelle des FTP Servers einsteigt. hier muss der Pfad bis zum "templates/" Ordner angegeben werden.
 
@@ -49,7 +52,11 @@ fileExtension und remotePath sollten so belassen werden. RemotePath muss angepas
 Version 1.0
 getestet in Test Umgebung und unter realen Bedingungen
 
-### 1.0.0
+## 0.0.2
+
+Template Folder Name ausgelagert
+
+### 0.0.1
 
 errster MVP release
 
