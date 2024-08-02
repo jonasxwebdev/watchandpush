@@ -15,9 +15,9 @@ In diesem muss sich eine wnb.json befinden.
 
 ```
 ├── /
-│   ├── .vscode
+│   ├── .vscode/
 │   │   ├── wnb.json
-├── templates
+├── ├── templates/
 │   │   ├── **/ alle Projekte
 ```
 
