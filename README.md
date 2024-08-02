@@ -21,9 +21,9 @@ In diesem muss sich eine wnb.json befinden.
 │   │   ├── **/ alle Projekte
 ```
 
-# Wichtig! "\/" ist dabei der Workspace Ordner in VSCode
+### Wichtig! "\/" ist dabei der Workspace Ordner in VSCode
 
-Mit folgendem inhaltlichen Aufbau:
+Aufbau der wnb.json:
 
 ```json
 {
