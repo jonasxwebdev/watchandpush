@@ -1,14 +1,21 @@
-# watchandpush README
+# watchandpush
+
+## Vorwort
+
+Diese Erweiterung ist nur für Mitarbeiter der Ulmer WSE gedacht und funktioniert auch nur in dieser Entwicklungsumgebung.
+
+## Befehle
+
+mit cmd + shift + P kann das VS Code command Fesnter aufgerufen werden. Hier sind nach aktiverung nun folgende Befehle hinterlegt:
+
+-   Watch and Build
+-   Stop Watching
 
 ## Features
 
-### Seit der 0.0.3
+"Watch and Push": Nach aktivierung überwacht sie die festgelegte Dateinendung im aktuellen Workspace Ordner und führt nach einer Änderung dieser den vorher festgelegten build aus. Gleichzeitig werden alle css Dateien überwacht und bei einer Änderung auf den hinterlegten FTP Server geladen.
 
-#### Es gibt nun einen weiteren Befehl "Stop Watching" dieser stoppt alle aktiven Datei Watcher.
-
-Diese Erweiterung führt den Befehl "Watch and Push" ein. Nach aktivierung überwacht sie die festgelegte Dateinendung im aktuellen Workspace Ordner und führt nach einer Änderung dieser den vorher festgelegten build aus. Gleichzeitig werden alle css Dateien überwacht und bei einer Änderung auf den hinterlegten FTP Server geladen.
-
-Diese Erweiterung ist nur für Mitarbeiter der Ulmer WSE gedacht und funktioniert auch nur in dieser Entwicklungsumgebung.
+"Stop Watching": alle aktiven Datei Watcher werden inaktiv gestellt.
 
 ## Voraussetzungen
 
@@ -41,11 +48,12 @@ Aufbau der wnb.json:
 }
 ```
 
-der buildType, entweder "prod" oder "dev" entscheidet welcher build command aus der Package.json des jeweiligen Projekts ausgelesen und ausgeführt wird.
+der buildType, entweder _"prod"_ oder _"dev"_ entscheidet welcher build command aus der Package.json des jeweiligen Projekts ausgelesen und ausgeführt wird.
 
-templatesFolderName ist der OrdnerName in dem sich die lokale Ordner Struktur befindet.
+_templatesFolderName_ ist der OrdnerName in dem sich die lokale Projektstruktur befindet. Im Beispiel oben also "templates".
 
-fileExtension und remotePath sollten so belassen werden. RemotePath muss angepasst werden, wenn der FTP Benutzer an einer anderen Stelle des FTP Servers einsteigt. hier muss der Pfad bis zum "templates/" Ordner angegeben werden.
+_fileExtension_ und _remotePath_ sollten so belassen werden.
+_RemotePath_ muss angepasst werden, wenn der FTP Benutzer an einer früheren Stelle des FTP Servers einsteigt. hier muss der Pfad bis inkl. zum "templates/" Ordner angegeben werden.
 
 ## Bekannte Fehler
 
@@ -53,8 +61,9 @@ fileExtension und remotePath sollten so belassen werden. RemotePath muss angepas
 
 ## Release Notes
 
-Version 1.0
-getestet in Test Umgebung und unter realen Bedingungen
+## 0.0.4
+
+Der Code wurde nun soweit verallgemeinert, dass auch Zeitschriften Objekte, welche mit Tailwind aufgsetzt sind, korrekt erfasst werden und das CSS generiert wird.
 
 ## 0.0.3
 
