@@ -3,6 +3,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 
 import { Client } from "basic-ftp";
+import { exec } from "child_process";
 
 interface FTPSettings {
 	host: string;
@@ -35,7 +36,7 @@ export async function uploadFile(ftpSettings: FTPSettings, localPath: string, re
 	}
 }
 
-export function getBuildPath(path: String, templateFolderName: string = "templates"): string {
+export function getProjectRoot(path: String, templateFolderName: string = "templates"): string {
 	// Split the path by '/'
 	const parts = path.split("/");
 
@@ -47,67 +48,113 @@ export function getBuildPath(path: String, templateFolderName: string = "templat
 		}
 	}
 
-	// If no 'templates' folder is found or it's the last part of the path, return an empty string
+	// If no 'templateFolderName' folder is found or it's the last part of the path, return an empty string
 	if (lastIndex === -1 || lastIndex === parts.length - 1) {
 		return "";
 	}
 
-	// Reconstruct the path after the last 'templates' folder
+	// Reconstruct the path after the last 'templateFolderName' folder
 	const pathAfterTemplates = parts.slice(0, lastIndex + 2).join("/");
 
 	return pathAfterTemplates;
 }
 
-// async function readPackageJson(folderPath: string): Promise<object> {
-// 	const packageJsonPath = path.join(folderPath, "/package.json");
+export function getPathAfterLastOccurrence(filepath: string, searchString: string): string {
+	const lastIndex = filepath.lastIndexOf(searchString);
 
-// 	try {
-// 		// Read the contents of the package.json file asynchronously
-// 		const data = await fs.readFile(packageJsonPath, "utf-8");
+	if (lastIndex !== -1) {
+		// Adding the length of searchString to get the part after the searchString
+		return filepath.substring(lastIndex + searchString.length);
+	} else {
+		return ""; // Return an empty string if searchString is not found
+	}
+}
 
-// 		// Parse the JSON content
-// 		const packageJson = JSON.parse(data);
+function removeLastFolder(path: string): string {
+	const segments = path.split("/");
 
-// 		// Return the "scripts" object
-// 		return packageJson.scripts;
-// 	} catch (error) {
-// 		console.error("Error reading or parsing package.json:", error);
-// 		return {};
-// 	}
-// }
+	// Check if there are at least two segments (one folder and one file/last folder)
+	if (segments.length > 1) {
+		segments.pop(); // Remove the last segment
+		return segments.join("/");
+	}
 
-// function compareBuildPreferences(obj: { [key: string]: any }, buildPreferences: string) {
-// 	for (const key of Object.keys(obj)) {
-// 		if (key.includes(buildPreferences)) {
-// 			return key;
-// 		}
-// 	}
-// 	return undefined;
-// }
+	return path; // Return the original path if it doesn't have enough segments
+}
+function extractProjectName(path: string): string {
+	const segments = path.split("/");
+	// Check if there are at least two segments (one folder and one file/last folder)
+	if (segments.length > 1) {
+		return segments[segments.length - 1];
+	}
+	return path; // Return the original path if it doesn't have enough segments
+}
+function sanitizeUnderscores(input: string): string {
+	return input.replace(/_/g, "-");
+}
 
-// export function craftBuildCommand(folderPath: string, buildPreferences: string): string {
-// 	readPackageJson(folderPath).then((scripts) => {
-// 		return `npm run ${compareBuildPreferences(scripts, buildPreferences)}`;
-// 	});
-// 	return "";
-// }
-
-export function getBuildCommand(buildType: string, folderPath: string): string | null {
-	const packageJsonPath = path.join(folderPath, "/package.json");
+export function execBuildCommand(buildType: string, ProjectPath: string): void | null {
+	const packageJsonPath = path.join(ProjectPath, "/package.json");
+	const defaultProjectPath = path.join(
+		removeLastFolder(ProjectPath),
+		"/_default_tailwind3_zeitschriften/package.json"
+	);
 	if (fs.existsSync(packageJsonPath)) {
 		const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
 		const scripts = packageJson.scripts;
 		for (const scriptName in scripts) {
 			if (scripts.hasOwnProperty(scriptName)) {
 				if (scriptName.includes(buildType)) {
-					return `npm run ${scriptName}`;
+					exec(
+						`npm run ${scriptName}`,
+						{
+							cwd: ProjectPath,
+						},
+						(error, stdout, stderr) => {
+							if (error) {
+								vscode.window.showErrorMessage(`Fehler beim Build: ${stderr}`);
+								return;
+							}
+							vscode.window.setStatusBarMessage("Build erfolgreich", 2000);
+						}
+					);
+					return;
 				}
 			}
 		}
-		vscode.window.setStatusBarMessage(`Kein Build-Skript für ${buildType} gefunden!`, 5000);
+		vscode.window.showErrorMessage(`Kein Build-Skript für ${buildType} gefunden!`);
+		return null;
+	} else if (fs.existsSync(defaultProjectPath)) {
+		const defaultPackageJson = JSON.parse(fs.readFileSync(defaultProjectPath, "utf-8"));
+		const defaultScripts = defaultPackageJson.scripts;
+		for (const key of Object.keys(defaultScripts)) {
+			if (key.includes(sanitizeUnderscores(extractProjectName(ProjectPath))) && key.includes(buildType)) {
+				console.log(key);
+				console.log(defaultProjectPath);
+				exec(
+					`npm run ${key}`,
+					{
+						cwd: removeLastFolder(defaultProjectPath),
+					},
+					(error, stdout, stderr) => {
+						if (error) {
+							vscode.window.showErrorMessage(`Fehler beim Build: ${stderr}`);
+							return;
+						}
+						vscode.window.setStatusBarMessage("Build erfolgreich", 2000);
+					}
+				);
+				return;
+			}
+		}
+		vscode.window.showErrorMessage(
+			`Kein default Build-Skript für ${sanitizeUnderscores(
+				extractProjectName(ProjectPath)
+			)} ${buildType} gefunden!`
+		);
 		return null;
 	} else {
-		vscode.window.setStatusBarMessage("package.json nicht gefunden!", 5000);
+		vscode.window.showErrorMessage("package.json nicht gefunden!");
 		return null;
 	}
 }

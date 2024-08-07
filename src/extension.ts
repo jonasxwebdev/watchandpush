@@ -3,9 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 
-import { getBuildCommand, getBuildPath, uploadFile } from "./helper";
-
-import { exec } from "child_process";
+import { execBuildCommand, getPathAfterLastOccurrence, getProjectRoot, uploadFile } from "./helper";
 
 interface FTPSettings {
 	host: string;
@@ -35,6 +33,7 @@ function readConfig(folderPath: string): Config | null {
 }
 
 export function activate(context: vscode.ExtensionContext) {
+	vscode.window.setStatusBarMessage("WnB");
 	let watchAndBuildCommand = vscode.commands.registerCommand("extension.watchAndBuild", () => {
 		vscode.window.setStatusBarMessage("Dateien werden überwacht...");
 
@@ -68,33 +67,23 @@ export function activate(context: vscode.ExtensionContext) {
 			// 	`Änderung erkannt: ${filePath.substring(0, filePath.lastIndexOf("/"))}`,
 			// 	5000
 			// );
-			log(getBuildPath(filePath));
+			log(getProjectRoot(filePath));
 
-			var buildPath = getBuildPath(filePath, templateFolderName);
-			var buildCommand = getBuildCommand(buildType, buildPath);
-			if (!buildCommand) {
-				return;
-			}
-			exec(
-				buildCommand,
-				{
-					cwd: buildPath,
-				},
-				(error, stdout, stderr) => {
-					if (error) {
-						vscode.window.showErrorMessage(`Fehler beim Build: ${stderr}`);
-						return;
-					}
-					vscode.window.setStatusBarMessage("Build erfolgreich", 2000);
-				}
-			);
+			var buildPath = getProjectRoot(filePath, templateFolderName);
+			// korrekten Build command and der richtigen Stelle ausführen
+			execBuildCommand(buildType, buildPath);
 		});
 		cssWatcher.on("change", async (cssPath) => {
 			const parts = cssPath.split("/");
 			vscode.window.setStatusBarMessage(`CSS-Datei geändert: ${parts[parts.length - 1]}`, 2000);
 			log(parts);
+			log(getPathAfterLastOccurrence(cssPath, templateFolderName));
 			log(path.join(ftpSettings.remotePath, parts.slice(-3).join("/")));
-			await uploadFile(ftpSettings, cssPath, path.join(ftpSettings.remotePath, parts.slice(-3).join("/")));
+			await uploadFile(
+				ftpSettings,
+				cssPath,
+				path.join(ftpSettings.remotePath, getPathAfterLastOccurrence(cssPath, templateFolderName))
+			);
 			// log(cssPath);
 			// log(path.join(ftpSettings.remotePath, parts.slice(-3).join("/")));
 		});
