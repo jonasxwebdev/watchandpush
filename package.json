@@ -5,7 +5,7 @@
 	"publisher": "jonasxwebdev",
 	"repository": "https://github.com/jonasxwebdev/watchandpush",
 	"version": "0.1.0",
-	"icon": "./icon/logo.png",
+	"icon": "icon/logo.png",
 	"galleryBanner": {
 		"color": "#544859"
 	},
