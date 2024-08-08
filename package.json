@@ -4,7 +4,11 @@
 	"description": "watch files, build and push to ftp",
 	"publisher": "jonasxwebdev",
 	"repository": "https://github.com/jonasxwebdev/watchandpush",
-	"version": "0.0.4",
+	"version": "0.1.0",
+	"icon": "./icon/logo.png",
+	"galleryBanner": {
+		"color": "#544859"
+	},
 	"engines": {
 		"vscode": "^1.91.0"
 	},

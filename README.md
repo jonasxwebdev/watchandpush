@@ -61,6 +61,10 @@ _RemotePath_ muss angepasst werden, wenn der FTP Benutzer an einer früheren Ste
 
 ## Release Notes
 
+## 0.1 beta
+
+Der erste Beta Release. Logo und Banner sind nun im Marketplace zu sehen.
+
 ## 0.0.4
 
 Der Code wurde nun soweit verallgemeinert, dass auch Zeitschriften Objekte, welche mit Tailwind aufgsetzt sind, korrekt erfasst werden und das CSS generiert wird.
