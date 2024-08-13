@@ -19,8 +19,8 @@ mit cmd + shift + P kann das VS Code command Fesnter aufgerufen werden. Hier sin
 
 ## Voraussetzungen
 
-Vorraussetzung ist ein .vscode Ordner auf /templates Ebene.
-In diesem muss sich eine wnb.json befinden.
+Ein .vscode Ordner mit einer darin befindlichen "wnb.json" Datei. Der Aufbau der Datei wird weiter unten erläutert.
+dieser muss nun nicht mehr zwangsläufig auf der selben Ebene wie der Templates Ordner liegen.
 
 ```
 ├── /
@@ -61,7 +61,11 @@ _RemotePath_ muss angepasst werden, wenn der FTP Benutzer an einer früheren Ste
 
 ## Release Notes
 
-## 0.1 beta
+## 0.1.1
+
+Die Konfigurationsdatei "wnb.json" kann sich nun irgendwo im aktiven Workspace befinden und wird nun automatisch von der Erweiterung erkannt. Nun ist darauf zu achten, dass sich nur noch eine Konfigurationsdatei im Workspace befindet.
+
+## 0.1
 
 Der erste Beta Release. Logo und Banner sind nun im Marketplace zu sehen.
 
