@@ -14,8 +14,8 @@ interface FTPSettings {
 
 export async function uploadFile(ftpSettings: FTPSettings, localPath: string, remotePath: string): Promise<void> {
 	const client = new Client();
-
 	client.ftp.verbose = true;
+	vscode.window.setStatusBarMessage("uploading...", 5000);
 
 	try {
 		await client.access({

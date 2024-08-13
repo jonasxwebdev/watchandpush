@@ -21,46 +21,68 @@ interface Config {
 let watcher: chokidar.FSWatcher | null = null;
 let cssWatcher: chokidar.FSWatcher | null = null;
 
-function readConfig(folderPath: string): Config | null {
-	const configPath = path.join(folderPath, ".vscode/wnb.json");
-	if (fs.existsSync(configPath)) {
-		const configContent = fs.readFileSync(configPath, "utf-8");
-		return JSON.parse(configContent) as Config;
-	} else {
-		vscode.window.showErrorMessage("Konfigurationsdatei wnb.json nicht gefunden!");
-		return null;
+function findConfigFile(folderPath: string): string | null {
+	const files = fs.readdirSync(folderPath);
+
+	for (const file of files) {
+		const filePath = path.join(folderPath, file);
+		const stat = fs.statSync(filePath);
+
+		if (stat.isDirectory()) {
+			const configPath = findConfigFile(filePath);
+			if (configPath) {
+				return configPath;
+			}
+		} else if (file === "wnb.json") {
+			return filePath;
+		}
 	}
+
+	return null;
+}
+
+function readConfig(workspaceFolders: readonly vscode.WorkspaceFolder[]): Config | null {
+	for (const workspaceFolder of workspaceFolders) {
+		const folderPath = workspaceFolder.uri.fsPath;
+		const configPath = findConfigFile(folderPath);
+
+		if (configPath) {
+			const configContent = fs.readFileSync(configPath, "utf-8");
+			return JSON.parse(configContent) as Config;
+		}
+	}
+
+	vscode.window.setStatusBarMessage("Konfigurationsdatei wnb.json nicht gefunden!", 5000);
+	return null;
 }
 
 export function activate(context: vscode.ExtensionContext) {
 	vscode.window.setStatusBarMessage("WnB");
 	let watchAndBuildCommand = vscode.commands.registerCommand("extension.watchAndBuild", () => {
-		vscode.window.setStatusBarMessage("Dateien werden überwacht...");
-
-		const folderPath = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
-		if (!folderPath) {
-			vscode.window.showErrorMessage("Kein Ordner gefunden!");
+		const workspaceFolders = vscode.workspace.workspaceFolders;
+		if (!workspaceFolders) {
+			vscode.window.setStatusBarMessage("Kein Workspace gefunden!", 5000);
 			return;
 		}
 
-		const config = readConfig(folderPath);
+		const config = readConfig(workspaceFolders);
 		if (!config) {
 			return;
 		}
 
 		const { fileExtension, buildType, templateFolderName, ftp: ftpSettings } = config;
-
 		// Something to use when events are received.
 		const log = console.log.bind(console);
 
-		watcher = chokidar.watch(`${folderPath}/**/*${fileExtension}`, {
+		watcher = chokidar.watch(`${workspaceFolders[0].uri.fsPath}/**/*${fileExtension}`, {
 			ignored: /node_modules/,
 			persistent: true,
 		});
 
-		cssWatcher = chokidar.watch(`${folderPath}/**/*.css`, {
+		cssWatcher = chokidar.watch(`${workspaceFolders[0].uri.fsPath}/**/*.css`, {
 			persistent: true,
 		});
+		vscode.window.setStatusBarMessage("Dateien werden überwacht...");
 
 		watcher.on("change", (filePath: string) => {
 			// vscode.window.setStatusBarMessage(
