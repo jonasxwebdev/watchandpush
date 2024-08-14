@@ -52,7 +52,7 @@ function readConfig(workspaceFolders: readonly vscode.WorkspaceFolder[]): Config
 		}
 	}
 
-	vscode.window.setStatusBarMessage("Konfigurationsdatei wnb.json nicht gefunden!", 5000);
+	vscode.window.showErrorMessage("Konfigurationsdatei wnb.json nicht gefunden!");
 	return null;
 }
 
@@ -61,7 +61,7 @@ export function activate(context: vscode.ExtensionContext) {
 	let watchAndBuildCommand = vscode.commands.registerCommand("extension.watchAndBuild", () => {
 		const workspaceFolders = vscode.workspace.workspaceFolders;
 		if (!workspaceFolders) {
-			vscode.window.setStatusBarMessage("Kein Workspace gefunden!", 5000);
+			vscode.window.showErrorMessage("Kein Workspace gefunden!");
 			return;
 		}
 
@@ -89,7 +89,7 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 		watcher.on("change", (filePath: string) => {
-			log(getProjectRoot(filePath));
+			log(getProjectRoot(filePath, templateFolderName));
 			var buildPath = getProjectRoot(filePath, templateFolderName);
 			// korrekten Build command and der richtigen Stelle ausführen
 			execBuildCommand(buildType, buildPath);
