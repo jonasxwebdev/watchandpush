@@ -13,7 +13,7 @@ interface FTPSettings {
 }
 
 interface Config {
-	fileExtension: string;
+	fileExtensions: Array<string>;
 	buildType: string;
 	templateFolderName: string;
 	ftp: FTPSettings;
@@ -70,11 +70,13 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 
-		const { fileExtension, buildType, templateFolderName, ftp: ftpSettings } = config;
+		const { fileExtensions, buildType, templateFolderName, ftp: ftpSettings } = config;
 		// Something to use when events are received.
 		const log = console.log.bind(console);
+		log(fileExtensions);
 
-		watcher = chokidar.watch(`${workspaceFolders[0].uri.fsPath}/**/*${fileExtension}`, {
+		const watchPaths = fileExtensions.map((ext) => `${workspaceFolders[0].uri.fsPath}/**/*${ext}`);
+		watcher = chokidar.watch(watchPaths, {
 			ignored: /node_modules/,
 			persistent: true,
 		});
@@ -83,14 +85,11 @@ export function activate(context: vscode.ExtensionContext) {
 			persistent: true,
 		});
 		vscode.window.setStatusBarMessage("Dateien werden überwacht...");
-
+		if (!watcher) {
+			return;
+		}
 		watcher.on("change", (filePath: string) => {
-			// vscode.window.setStatusBarMessage(
-			// 	`Änderung erkannt: ${filePath.substring(0, filePath.lastIndexOf("/"))}`,
-			// 	5000
-			// );
 			log(getProjectRoot(filePath));
-
 			var buildPath = getProjectRoot(filePath, templateFolderName);
 			// korrekten Build command and der richtigen Stelle ausführen
 			execBuildCommand(buildType, buildPath);
@@ -112,17 +111,14 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	let stopWatchingCommand = vscode.commands.registerCommand("extension.stopWatching", () => {
-		if (watcher) {
+		if (watcher && cssWatcher) {
 			watcher.close();
+			cssWatcher.close();
 			watcher = null;
+			cssWatcher = null;
 			vscode.window.setStatusBarMessage("Überwachung gestoppt");
 		} else {
 			vscode.window.setStatusBarMessage("Keine Überwachung aktiv", 5000);
-		}
-
-		if (cssWatcher) {
-			cssWatcher.close();
-			cssWatcher = null;
 		}
 	});
 
