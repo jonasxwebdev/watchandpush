@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 
 import { Client } from "basic-ftp";
 import { exec } from "child_process";
+import { log } from "console";
 
 interface FTPSettings {
 	host: string;
@@ -36,11 +37,11 @@ export async function uploadFile(ftpSettings: FTPSettings, localPath: string, re
 	}
 }
 
-export function getProjectRoot(path: String, templateFolderName: string = "templates"): string {
+export function getProjectRoot(path: String, templateFolderName: string): string {
 	// Split the path by '/'
 	const parts = path.split("/");
 
-	// Find the index of the last 'templates' occurrence
+	// Find the index of the last 'templateFolderName' occurrence
 	let lastIndex = -1;
 	for (let i = 0; i < parts.length; i++) {
 		if (parts[i] === templateFolderName) {
@@ -116,6 +117,7 @@ export function execBuildCommand(buildType: string, ProjectPath: string): void |
 								return;
 							}
 							vscode.window.setStatusBarMessage("Build erfolgreich", 2000);
+							log(`npm run ${scriptName}`);
 						}
 					);
 					return;
@@ -129,8 +131,9 @@ export function execBuildCommand(buildType: string, ProjectPath: string): void |
 		const defaultScripts = defaultPackageJson.scripts;
 		for (const key of Object.keys(defaultScripts)) {
 			if (key.includes(sanitizeUnderscores(extractProjectName(ProjectPath))) && key.includes(buildType)) {
-				console.log(key);
-				console.log(defaultProjectPath);
+				log(key);
+				log(defaultProjectPath);
+				vscode.window.setStatusBarMessage("Building...", 5000);
 				exec(
 					`npm run ${key}`,
 					{
@@ -142,6 +145,7 @@ export function execBuildCommand(buildType: string, ProjectPath: string): void |
 							return;
 						}
 						vscode.window.setStatusBarMessage("Build erfolgreich", 2000);
+						log(`npm run ${key}`);
 					}
 				);
 				return;
