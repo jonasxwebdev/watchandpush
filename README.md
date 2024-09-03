@@ -36,9 +36,9 @@ Aufbau der wnb.json:
 
 ```json
 {
-	"fileExtension": ".htm",
-	"buildType": "prod",
-	"templateFolderName": "templates",
+	"fileExtensions": [".htm", ".scss"],
+    "buildType": "prod",
+    "templateFolderName": "templates",
 	"ftp": {
 		"host": "ulmer Webserver Name",
 		"user": "Benutzername",
@@ -60,6 +60,10 @@ _RemotePath_ muss angepasst werden, wenn der FTP Benutzer an einer früheren Ste
 -   wenn "dev" als build Type gewählt wird, kann es bis zu 10 Sekunden dauern, je nach Leistung des Clients, bis der build ausgeführt wird und die CSS Datei hochgeladen wird.
 
 ## Release Notes
+
+## 0.1.3
+
+Windows Dateipfade werden nun unterstützt
 
 ## 0.1.1
 
