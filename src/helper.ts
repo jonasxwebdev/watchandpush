@@ -37,9 +37,10 @@ export async function uploadFile(ftpSettings: FTPSettings, localPath: string, re
 	}
 }
 
-export function getProjectRoot(path: String, templateFolderName: string): string {
+export function getProjectRoot(pathName: string, templateFolderName: string): string {
+	console.log(pathName.replaceAll(path.sep, path.posix.sep));
 	// Split the path by '/'
-	const parts = path.split("/");
+	const parts = pathName.replaceAll(path.sep, path.posix.sep).split("/");
 
 	// Find the index of the last 'templateFolderName' occurrence
 	let lastIndex = -1;

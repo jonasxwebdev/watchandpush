@@ -90,7 +90,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		watcher.on("change", (filePath: string) => {
 			log(getProjectRoot(filePath, templateFolderName));
-			var buildPath = getProjectRoot(filePath, templateFolderName);
+			let buildPath = getProjectRoot(filePath, templateFolderName);
 			// korrekten Build command and der richtigen Stelle ausführen
 			execBuildCommand(buildType, buildPath);
 		});
