@@ -95,7 +95,7 @@ export function activate(context: vscode.ExtensionContext) {
 			execBuildCommand(buildType, buildPath);
 		});
 		cssWatcher.on("change", async (cssPath) => {
-			const parts = cssPath.split("/");
+			const parts = cssPath.replaceAll(path.sep, path.posix.sep).split("/");
 			vscode.window.setStatusBarMessage(`CSS-Datei geändert: ${parts[parts.length - 1]}`, 2000);
 			log(parts);
 			log(getPathAfterLastOccurrence(cssPath, templateFolderName));
@@ -105,8 +105,6 @@ export function activate(context: vscode.ExtensionContext) {
 				cssPath,
 				path.join(ftpSettings.remotePath, getPathAfterLastOccurrence(cssPath, templateFolderName))
 			);
-			// log(cssPath);
-			// log(path.join(ftpSettings.remotePath, parts.slice(-3).join("/")));
 		});
 	});
 

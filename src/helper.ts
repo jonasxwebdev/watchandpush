@@ -62,6 +62,7 @@ export function getProjectRoot(pathName: string, templateFolderName: string): st
 }
 
 export function getPathAfterLastOccurrence(filepath: string, searchString: string): string {
+	//return the path after the last occurence of the searchstring
 	const lastIndex = filepath.lastIndexOf(searchString);
 
 	if (lastIndex !== -1) {
@@ -72,8 +73,8 @@ export function getPathAfterLastOccurrence(filepath: string, searchString: strin
 	}
 }
 
-function removeLastFolder(path: string): string {
-	const segments = path.split("/");
+function removeLastFolder(pathName: string): string {
+	const segments = pathName.replaceAll(path.sep, path.posix.sep).split("/");
 
 	// Check if there are at least two segments (one folder and one file/last folder)
 	if (segments.length > 1) {
@@ -81,7 +82,7 @@ function removeLastFolder(path: string): string {
 		return segments.join("/");
 	}
 
-	return path; // Return the original path if it doesn't have enough segments
+	return pathName; // Return the original path if it doesn't have enough segments
 }
 function extractProjectName(path: string): string {
 	const segments = path.split("/");
@@ -96,10 +97,10 @@ function sanitizeUnderscores(input: string): string {
 }
 
 export function execBuildCommand(buildType: string, ProjectPath: string): void | null {
-	const packageJsonPath = path.join(ProjectPath, "/package.json");
+	const packageJsonPath = path.join(ProjectPath, "package.json");
 	const defaultProjectPath = path.join(
 		removeLastFolder(ProjectPath),
-		"/_default_tailwind3_zeitschriften/package.json"
+		"_default_tailwind3_zeitschriften","package.json"
 	);
 	if (fs.existsSync(packageJsonPath)) {
 		const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));

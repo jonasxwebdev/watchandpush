@@ -40,7 +40,7 @@ Aufbau der wnb.json:
     "buildType": "prod",
     "templateFolderName": "templates",
 	"ftp": {
-		"host": "ulmer Webserver Name",
+		"host": "ulmer Webserver Name || FTP Server IP Adresse",
 		"user": "Benutzername",
 		"password": "********",
 		"remotePath": "/templates"
@@ -60,6 +60,10 @@ _RemotePath_ muss angepasst werden, wenn der FTP Benutzer an einer früheren Ste
 -   wenn "dev" als build Type gewählt wird, kann es bis zu 10 Sekunden dauern, je nach Leistung des Clients, bis der build ausgeführt wird und die CSS Datei hochgeladen wird.
 
 ## Release Notes
+
+## 0.1.4
+
+Alle Tailwind Projekte werden nun korrekt erkannt und das passende css gebuildet + geuploaded
 
 ## 0.1.3
 
